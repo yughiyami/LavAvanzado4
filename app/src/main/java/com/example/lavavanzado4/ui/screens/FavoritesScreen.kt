@@ -10,20 +10,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.lavavanzado4.data.Product
 import com.example.lavavanzado4.ui.components.ProductCard
+import com.example.lavavanzado4.ui.viewmodel.StoreViewModel
 
 @Composable
 fun FavoritesScreen(
-    favoriteProducts: List<Product>,
-    onProductClick: (Product) -> Unit,
-    onFavoriteToggle: (Product) -> Unit
+    viewModel: StoreViewModel,
+    onProductClick: (Product) -> Unit
 ) {
+    val favoriteProducts = viewModel.favoriteProducts
+
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
             text = "Mis Favoritos",
             style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(16.dp)
         )
 
@@ -32,18 +36,27 @@ fun FavoritesScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "No tienes productos favoritos aún.")
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = "❤️", fontSize = 64.sp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Aún no tienes favoritos",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         } else {
             LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 items(favoriteProducts) { product ->
                     ProductCard(
                         product = product,
                         onProductClick = onProductClick,
-                        onFavoriteToggle = onFavoriteToggle
+                        onFavoriteToggle = { viewModel.toggleFavorite(it) },
+                        onAddToCart = { viewModel.addToCart(it) }
                     )
                 }
             }

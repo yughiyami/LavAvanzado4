@@ -1,9 +1,11 @@
 package com.example.lavavanzado4
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -14,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,29 +24,31 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.lavavanzado4.data.MockData
-import com.example.lavavanzado4.data.Product
+import com.example.lavavanzado4.data.repository.MockProductRepository
 import com.example.lavavanzado4.ui.screens.*
-import com.example.lavavanzado4.ui.theme.AppThemeMode
 import com.example.lavavanzado4.ui.theme.LavAvanzado4Theme
+import com.example.lavavanzado4.ui.viewmodel.StoreViewModel
+import com.example.lavavanzado4.ui.viewmodel.StoreViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Set window background to help with initial render
+        window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.WHITE))
         enableEdgeToEdge()
         setContent {
-            var currentTheme by remember { mutableStateOf(AppThemeMode.BLUE) }
+            val repository = remember { MockProductRepository() }
+            val viewModel: StoreViewModel = viewModel(factory = StoreViewModelFactory(repository))
+            
+            val currentTheme by viewModel.currentTheme
             
             LavAvanzado4Theme(themeMode = currentTheme) {
-                MainContent(
-                    onThemeChange = { 
-                        currentTheme = when(currentTheme) {
-                            AppThemeMode.BLUE -> AppThemeMode.GREEN
-                            AppThemeMode.GREEN -> AppThemeMode.PURPLE
-                            AppThemeMode.PURPLE -> AppThemeMode.ORANGE
-                            AppThemeMode.ORANGE -> AppThemeMode.BLUE
-                        }
-                    }
-                )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainContent(viewModel = viewModel)
+                }
             }
         }
     }
@@ -57,13 +62,10 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
 }
 
 @Composable
-fun MainContent(onThemeChange: () -> Unit) {
+fun MainContent(viewModel: StoreViewModel) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-
-    val favoriteProducts = remember { mutableStateListOf<Product>() }
-    val cartItems = remember { mutableStateListOf<Product>() }
 
     Scaffold(
         bottomBar = {
@@ -83,12 +85,11 @@ fun MainContent(onThemeChange: () -> Unit) {
                         }
                     )
                 }
-                // Theme Toggle Item
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Palette, contentDescription = "Tema") },
                     label = { Text("Tema") },
                     selected = false,
-                    onClick = onThemeChange
+                    onClick = { viewModel.toggleTheme() }
                 )
             }
         }
@@ -100,38 +101,22 @@ fun MainContent(onThemeChange: () -> Unit) {
         ) {
             composable(Screen.Home.route) {
                 HomeScreen(
+                    viewModel = viewModel,
                     onProductClick = { product ->
                         navController.navigate("details/${product.id}")
-                    },
-                    onFavoriteToggle = { product ->
-                        product.isFavorite = !product.isFavorite
-                        if (product.isFavorite) {
-                            if (!favoriteProducts.any { it.id == product.id }) favoriteProducts.add(product)
-                        } else {
-                            favoriteProducts.removeAll { it.id == product.id }
-                        }
                     }
                 )
             }
             composable(Screen.Favorites.route) {
                 FavoritesScreen(
-                    favoriteProducts = favoriteProducts,
+                    viewModel = viewModel,
                     onProductClick = { product ->
                         navController.navigate("details/${product.id}")
-                    },
-                    onFavoriteToggle = { product ->
-                        product.isFavorite = !product.isFavorite
-                        favoriteProducts.removeAll { it.id == product.id }
                     }
                 )
             }
             composable(Screen.Cart.route) {
-                CartScreen(
-                    cartItems = cartItems,
-                    onRemoveFromCart = { product ->
-                        cartItems.remove(product)
-                    }
-                )
+                CartScreen(viewModel = viewModel)
             }
             composable(
                 route = Screen.Details.route,
@@ -144,9 +129,7 @@ fun MainContent(onThemeChange: () -> Unit) {
                         product = it,
                         onBackClick = { navController.popBackStack() },
                         onAddToCart = { p ->
-                            if (!cartItems.any { item -> item.id == p.id }) {
-                                cartItems.add(p)
-                            }
+                            viewModel.addToCart(p)
                             navController.navigate(Screen.Cart.route)
                         }
                     )

@@ -5,18 +5,18 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 enum class AppThemeMode {
-    BLUE,
+    MODERN_BLUE,
     GREEN,
     PURPLE,
     ORANGE
 }
 
-val BlueLightScheme = lightColorScheme(
-    primary = BluePrimary,
-    onPrimary = BlueOnPrimary,
-    primaryContainer = BluePrimaryContainer,
-    onPrimaryContainer = BlueOnPrimaryContainer,
-    background = LightBackground,
+val ModernBlueLightScheme = lightColorScheme(
+    primary = ModernBluePrimary,
+    onPrimary = ModernBlueOnPrimary,
+    primaryContainer = ModernBlueSecondary.copy(alpha = 0.2f),
+    onPrimaryContainer = ModernBluePrimary,
+    background = ModernNeutral,
     surface = LightSurface,
     onSurface = LightOnSurface,
     outline = LightOutline
@@ -57,11 +57,11 @@ val OrangeLightScheme = lightColorScheme(
 
 @Composable
 fun LavAvanzado4Theme(
-    themeMode: AppThemeMode = AppThemeMode.BLUE,
+    themeMode: AppThemeMode = AppThemeMode.MODERN_BLUE,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when(themeMode) {
-        AppThemeMode.BLUE -> BlueLightScheme
+        AppThemeMode.MODERN_BLUE -> ModernBlueLightScheme
         AppThemeMode.GREEN -> GreenLightScheme
         AppThemeMode.PURPLE -> PurpleLightScheme
         AppThemeMode.ORANGE -> OrangeLightScheme

@@ -6,70 +6,90 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.lavavanzado4.data.Category
-import com.example.lavavanzado4.data.MockData
 import com.example.lavavanzado4.data.Product
 import com.example.lavavanzado4.ui.components.CategoryCard
 import com.example.lavavanzado4.ui.components.ProductCard
 import com.example.lavavanzado4.ui.components.ProductSearchBar
+import com.example.lavavanzado4.ui.viewmodel.StoreViewModel
 
+/**
+ * SOLID: Open/Closed Principle.
+ * Pantalla de inicio que integra búsqueda y categorías dinámicas.
+ */
 @Composable
 fun HomeScreen(
-    onProductClick: (Product) -> Unit,
-    onFavoriteToggle: (Product) -> Unit
+    viewModel: StoreViewModel,
+    onProductClick: (Product) -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
-
-    val filteredProducts = MockData.products.filter { product ->
-        val matchesSearch = product.name.contains(searchQuery, ignoreCase = true)
-        val matchesCategory = selectedCategoryId == null || product.categoryId == selectedCategoryId
-        matchesSearch && matchesCategory
-    }
+    val filteredProducts = viewModel.getFilteredProducts()
+    val searchQuery by viewModel.searchQuery
+    val selectedCategoryId by viewModel.selectedCategoryId
 
     Column(modifier = Modifier.fillMaxSize()) {
         ProductSearchBar(
             query = searchQuery,
-            onQueryChange = { searchQuery = it }
+            onQueryChange = { viewModel.updateSearchQuery(it) }
         )
 
-        Text(
-            text = "Categorías",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Categorías",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
 
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 12.dp),
-            modifier = Modifier.padding(bottom = 8.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp)
         ) {
             item {
                 CategoryCard(
-                    category = Category(0, "Todo", "🔍"),
+                    category = Category(0, "Todo", "🔥"),
                     isSelected = selectedCategoryId == null,
-                    onCategoryClick = { selectedCategoryId = null }
+                    onCategoryClick = { viewModel.selectCategory(null) }
                 )
             }
-            items(MockData.categories) { category ->
+            items(viewModel.categories) { category ->
                 CategoryCard(
                     category = category,
                     isSelected = selectedCategoryId == category.id,
-                    onCategoryClick = { selectedCategoryId = it.id }
+                    onCategoryClick = { viewModel.selectCategory(it.id) }
                 )
             }
         }
 
-        Text(
-            text = "Productos Destacados",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Productos Destacados",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            TextButton(onClick = { /* View All */ }) {
+                Text(text = "Ver todo", style = MaterialTheme.typography.labelLarge)
+            }
+        }
 
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -79,7 +99,8 @@ fun HomeScreen(
                 ProductCard(
                     product = product,
                     onProductClick = onProductClick,
-                    onFavoriteToggle = onFavoriteToggle
+                    onFavoriteToggle = { viewModel.toggleFavorite(it) },
+                    onAddToCart = { viewModel.addToCart(it) }
                 )
             }
         }
