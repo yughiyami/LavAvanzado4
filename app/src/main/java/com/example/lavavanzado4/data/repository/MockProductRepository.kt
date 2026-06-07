@@ -5,12 +5,37 @@ import com.example.lavavanzado4.data.MockData
 import com.example.lavavanzado4.data.Product
 import com.example.lavavanzado4.domain.repository.ProductRepository
 
-/**
- * SOLID: Liskov Substitution.
- * This class implements the ProductRepository interface using mock data.
- * It can be easily replaced by a RemoteRepository without changing the business logic.
- */
 class MockProductRepository : ProductRepository {
-    override fun getProducts(): List<Product> = MockData.products
-    override fun getCategories(): List<Category> = MockData.categories
+
+    private val _products = MockData.products.toMutableList()
+    private val _categories = MockData.categories.toMutableList()
+
+    override fun getProducts(): List<Product> = _products.toList()
+
+    override fun getCategories(): List<Category> = _categories.toList()
+
+    override fun getProductById(id: Int): Product? = _products.find { it.id == id }
+
+    override fun addProduct(product: Product) {
+        val newId = (_products.maxOfOrNull { it.id } ?: 0) + 1
+        _products.add(product.copy(id = newId))
+    }
+
+    override fun updateProduct(product: Product) {
+        val index = _products.indexOfFirst { it.id == product.id }
+        if (index != -1) _products[index] = product
+    }
+
+    override fun deleteProduct(productId: Int) {
+        _products.removeAll { it.id == productId }
+    }
+
+    override fun addCategory(category: Category) {
+        val newId = (_categories.maxOfOrNull { it.id } ?: 0) + 1
+        _categories.add(category.copy(id = newId))
+    }
+
+    override fun deleteCategory(categoryId: Int) {
+        _categories.removeAll { it.id == categoryId }
+    }
 }

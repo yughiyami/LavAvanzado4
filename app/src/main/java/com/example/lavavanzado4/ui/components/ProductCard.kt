@@ -1,6 +1,5 @@
 package com.example.lavavanzado4.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,16 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.lavavanzado4.data.Product
 
-/**
- * SOLID: Single Responsibility Principle.
- * Encargado de renderizar la tarjeta de producto siguiendo el diseño "Azul Moderno".
- * Utiliza OCP mediante lambdas para acciones de clic y favoritos.
- */
 @Composable
 fun ProductCard(
     product: Product,
+    isFavorite: Boolean,
     onProductClick: (Product) -> Unit,
     onFavoriteToggle: (Product) -> Unit,
     onAddToCart: (Product) -> Unit,
@@ -36,7 +32,7 @@ fun ProductCard(
 ) {
     Card(
         modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
             .fillMaxWidth()
             .clickable { onProductClick(product) },
         shape = RoundedCornerShape(16.dp),
@@ -49,22 +45,18 @@ fun ProductCard(
                 .height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product Image Placeholder
-            Box(
+            AsyncImage(
+                model = product.imageUrl,
+                contentDescription = product.name,
                 modifier = Modifier
                     .size(80.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "📦", fontSize = 32.sp)
-            }
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = product.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -82,10 +74,11 @@ fun ProductCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "$${product.price}",
+                    text = "S/. ${String.format("%.2f", product.price)}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 18.sp
                 )
             }
 
@@ -99,12 +92,11 @@ fun ProductCard(
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector = if (product.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "Favorito",
-                        tint = if (product.isFavorite) Color.Red else MaterialTheme.colorScheme.outline
+                        tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.outline
                     )
                 }
-                
                 Button(
                     onClick = { onAddToCart(product) },
                     shape = RoundedCornerShape(8.dp),
