@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.lavavanzado4.data.Product
+import com.example.lavavanzado4.domain.model.Product
 import com.example.lavavanzado4.ui.state.ProductUiState
 import com.example.lavavanzado4.ui.viewmodel.StoreViewModel
 

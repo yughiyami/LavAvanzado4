@@ -1,7 +1,7 @@
 package com.example.lavavanzado4.domain.repository
 
-import com.example.lavavanzado4.data.Category
-import com.example.lavavanzado4.data.Product
+import com.example.lavavanzado4.domain.model.Category
+import com.example.lavavanzado4.domain.model.Product
 
 interface ProductRepository {
     fun getProducts(): List<Product>

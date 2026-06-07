@@ -1,8 +1,8 @@
 package com.example.lavavanzado4.data.repository
 
-import com.example.lavavanzado4.data.Category
 import com.example.lavavanzado4.data.MockData
-import com.example.lavavanzado4.data.Product
+import com.example.lavavanzado4.domain.model.Category
+import com.example.lavavanzado4.domain.model.Product
 import com.example.lavavanzado4.domain.repository.ProductRepository
 
 class MockProductRepository : ProductRepository {

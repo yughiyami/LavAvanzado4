@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.lavavanzado4.data.Category
+import com.example.lavavanzado4.domain.model.Category
 import com.example.lavavanzado4.ui.state.ProductUiState
 import com.example.lavavanzado4.ui.viewmodel.StoreViewModel
 

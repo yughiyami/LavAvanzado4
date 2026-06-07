@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.lavavanzado4.data.Product
+import com.example.lavavanzado4.domain.model.Product
 import com.example.lavavanzado4.ui.components.AppButton
 import com.example.lavavanzado4.ui.state.ProductUiState
 import com.example.lavavanzado4.ui.viewmodel.StoreViewModel

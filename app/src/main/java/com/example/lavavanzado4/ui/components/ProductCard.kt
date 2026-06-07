@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.lavavanzado4.data.Product
+import com.example.lavavanzado4.domain.model.Product
 
 @Composable
 fun ProductCard(

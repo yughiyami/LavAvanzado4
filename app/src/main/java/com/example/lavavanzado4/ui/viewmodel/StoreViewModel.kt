@@ -3,8 +3,8 @@ package com.example.lavavanzado4.ui.viewmodel
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.lavavanzado4.data.Category
-import com.example.lavavanzado4.data.Product
+import com.example.lavavanzado4.domain.model.Category
+import com.example.lavavanzado4.domain.model.Product
 import com.example.lavavanzado4.domain.repository.ProductRepository
 import com.example.lavavanzado4.ui.state.ProductUiState
 import com.example.lavavanzado4.ui.theme.AppThemeMode
